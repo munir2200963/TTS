@@ -251,6 +251,7 @@ class Tacotron2(BaseTacotron):
             # B x gst_dim
             encoder_outputs = self.compute_gst(encoder_outputs, aux_input["style_mel"], aux_input["d_vectors"])
 
+        capacitron_vae_outputs = None
         if self.capacitron_vae and self.use_capacitron_vae:
             if aux_input["style_text"] is not None:
                 style_text_embedding = self.embedding(aux_input["style_text"])
@@ -263,7 +264,7 @@ class Tacotron2(BaseTacotron):
                 else None
             )  # pylint: disable=not-callable
             # B x capacitron_VAE_embedding_dim
-            encoder_outputs, *_ = self.compute_capacitron_VAE_embedding(
+            encoder_outputs, *capacitron_vae_outputs = self.compute_capacitron_VAE_embedding(
                 encoder_outputs,
                 reference_mel_info=[aux_input["style_mel"], reference_mel_length]
                 if aux_input["style_mel"] is not None
@@ -296,6 +297,7 @@ class Tacotron2(BaseTacotron):
             "decoder_outputs": decoder_outputs,
             "alignments": alignments,
             "stop_tokens": stop_tokens,
+            "capacitron_vae_outputs": capacitron_vae_outputs,
         }
         return outputs
 
